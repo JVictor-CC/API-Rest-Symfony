@@ -16,28 +16,25 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 60)]
+    #[ORM\Column(length: 60, unique: true)]
     private ?string $username = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private array $saved_recipes = [];
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $created_recipes = [];
-
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Recipe::class)]
-    private Collection $recipes;
+    private Collection $created_recipes;
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, unique: true)]
     private ?UserCredentials $credentials = null;
 
     public function __construct()
     {
-        $this->recipes = new ArrayCollection();
+        $this->created_recipes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -81,30 +78,18 @@ class User
         return $this;
     }
 
-    public function getCreatedRecipes(): array
-    {
-        return $this->created_recipes;
-    }
-
-    public function setCreatedRecipes(?array $created_recipes): self
-    {
-        $this->created_recipes = $created_recipes;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Recipe>
      */
     public function getRecipes(): Collection
     {
-        return $this->recipes;
+        return $this->created_recipes;
     }
 
     public function addRecipe(Recipe $recipe): self
     {
-        if (!$this->recipes->contains($recipe)) {
-            $this->recipes->add($recipe);
+        if (!$this->created_recipes->contains($recipe)) {
+            $this->created_recipes->add($recipe);
             $recipe->setUser($this);
         }
 
@@ -113,7 +98,7 @@ class User
 
     public function removeRecipe(Recipe $recipe): self
     {
-        if ($this->recipes->removeElement($recipe)) {
+        if ($this->created_recipes->removeElement($recipe)) {
             // set the owning side to null (unless already changed)
             if ($recipe->getUser() === $this) {
                 $recipe->setUser(null);
