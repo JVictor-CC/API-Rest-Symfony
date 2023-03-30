@@ -16,8 +16,19 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('api/v1/user/')]
 class UserController extends AbstractController
 {
+
+    private $entityManager;
+    private $validator;
+
+    public function __construct( EntityManagerInterface $entityManager, ValidatorInterface $validator )
+    {
+        $this->entityManager = $entityManager;
+        $this->validator = $validator;
+    }
+
+
     #[Route('register', methods: 'POST')]
-    public function register(Request $req, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse | Response
+    public function register(Request $req): JsonResponse
     {
         $data = json_decode($req->getContent(), true);
 
@@ -27,11 +38,11 @@ class UserController extends AbstractController
 
         $credentials = new UserCredentials();
         $credentials->setPassword($data['password']);
-        $credentialsErrors = $validator->validate($credentials);
+        $credentialsErrors = $this->validator->validate($credentials);
 
         if (count($credentialsErrors) > 0 ) 
         {
-            return new JsonResponse(['errors' => (string) $credentialsErrors], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['errors' => (string) $credentialsErrors]);
         }
 
         $hashedPassword = password_hash( $data['password'], PASSWORD_ARGON2I );
@@ -39,26 +50,25 @@ class UserController extends AbstractController
         $user->setCredentials($credentials);
         $credentials->setUser($user);
 
-        $userErrors = $validator->validate($user);
+        $userErrors = $this->validator->validate($user);
 
         if (count($userErrors) > 0 ) 
         {
-            return new JsonResponse(['errors' => (string) $userErrors], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['errors' => (string) $userErrors]);
         }
             
         try
         {
-            $entityManager->persist($user);
-            $entityManager->persist($credentials);
-            $entityManager->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->persist($credentials);
+            $this->entityManager->flush();
         } 
         catch (\Exception $e) 
         {
             return new JsonResponse(['Caught exception:' => $e->getMessage()]);
         }
         
-        
-        if( $entityManager->contains($user) )
+        if( $this->entityManager->contains($user) )
         {
             return new JsonResponse("User successfully created", 200);
         }

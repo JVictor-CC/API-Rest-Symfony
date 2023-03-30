@@ -29,12 +29,15 @@ class Recipe
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $meal_type = null;
 
-    #[ORM\Column(length: 400)]
-    private ?string $recipe_instructions = null;
+    #[ORM\Column(length: 1500)]
+    private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'recipes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $instructions = [];
 
     public function getId(): ?int
     {
@@ -101,14 +104,14 @@ class Recipe
         return $this;
     }
 
-    public function getRecipeInstructions(): ?string
+    public function getDescription(): ?string
     {
-        return $this->recipe_instructions;
+        return $this->description;
     }
 
-    public function setRecipeInstructions(string $recipe_instructions): self
+    public function setDescription(string $description): self
     {
-        $this->recipe_instructions = $recipe_instructions;
+        $this->description = $description;
 
         return $this;
     }
@@ -121,6 +124,18 @@ class Recipe
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getInstructions(): array
+    {
+        return $this->instructions;
+    }
+
+    public function setInstructions(array $instructions): self
+    {
+        $this->instructions = $instructions;
 
         return $this;
     }

@@ -12,9 +12,42 @@ App\Entity\User:
 
 App\Entity\UserCredentials:
     properties:
-      password:
-        - Length:
-            min: 8
-            max: 50
-            minMessage: 'Your password must be at least {{ limit }} characters long'
-            maxMessage: 'Your password cannot be longer than {{ limit }} characters'
+        password:
+            - Length:
+                min: 8
+                max: 50
+                minMessage: 'Your password must be at least {{ limit }} characters long'
+                maxMessage: 'Your password cannot be longer than {{ limit }} characters'
+
+App\Entity\Recipe:
+    properties:
+        recipe_name:
+            - Length:
+                min: 3
+                max: 150
+                minMessage: 'Your recipe name must be at least {{ limit }} characters long'
+                maxMessage: 'Your recipe name cannot be longer than {{ limit }} characters'
+        ingredients:
+            - Type:
+                type: array
+                message: The value {{ value }} is not a valid {{ type }}.
+        description:
+            - Type:
+                type: string
+                message: The value {{ value }} is not a valid {{ type }}.
+        instructions:
+            - Type:
+                type: array
+                message: The value {{ value }} is not a valid {{ type }}.
+        meal_type:
+            - Type:
+                type: [string, null]
+                message: The value {{ value }} is not a valid {{ type }}.
+        cuisine_type:
+            - Type:
+                type: [string, null]
+                message: The value {{ value }} is not a valid {{ type }}.
+        preparation_time:
+            - Type:
+                type: [string, int, null]
+                message: The value {{ value }} is not a valid {{ type }}.
