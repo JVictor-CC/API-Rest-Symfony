@@ -88,23 +88,14 @@ class User
 
     public function addRecipe(Recipe $recipe): self
     {
-        if (!$this->created_recipes->contains($recipe)) {
-            $this->created_recipes->add($recipe);
-            $recipe->setUser($this);
-        }
-
+        $this->created_recipes->add($recipe);
+        $recipe->setUser($this);
         return $this;
     }
 
     public function removeRecipe(Recipe $recipe): self
     {
-        if ($this->created_recipes->removeElement($recipe)) {
-            // set the owning side to null (unless already changed)
-            if ($recipe->getUser() === $this) {
-                $recipe->setUser(null);
-            }
-        }
-
+        $this->created_recipes->removeElement($recipe);
         return $this;
     }
 

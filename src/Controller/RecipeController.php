@@ -29,12 +29,80 @@ class RecipeController extends AbstractController
         $this->recipeRepo = $recipeRepository;
     }
 
-    #[Route('list', name: 'app_recipe')]
+    #[Route('list')]
     public function listRecipes(Request $req): JsonResponse
     {
-        $limit = $req->query->get('limit', 10);
-        $recipes = $this->recipeRepo->findBy([], ['id' => 'ASC'], $limit);
-        return new JsonResponse($recipes);
+        try
+        {
+            $limit = $req->query->get('limit', 10);
+            $recipes = $this->recipeRepo->findBy([], ['id' => 'ASC'], $limit);
+            if(!$recipes) 
+            {
+                return new JsonResponse(['error' => 'Recipe not found'], 404);
+            }
+            return new JsonResponse($recipes);
+        }
+        catch(\Exception $e)
+        {
+            return new JsonResponse(['Caught exception:' => $e->getMessage()]);
+        }
+    }
+
+    #[Route('list_by_id/{id}')]
+    public function listById(int $id): JsonResponse
+    {
+        try
+        {
+            $recipes = $this->recipeRepo->findOneBy(['id' => $id]);
+            if(!$recipes) 
+            {
+                return new JsonResponse(['error' => 'Recipe not found'], 404);
+            }
+            return new JsonResponse($recipes);
+        }
+        catch(\Exception $e)
+        {
+            return new JsonResponse(['Caught exception:' => $e->getMessage()]);
+        }
+    }
+
+    #[Route('delete_recipe/{id}', methods: 'DELETE')]
+    public function delete_recipe(int $id, SessionInterface $session): JsonResponse
+    {
+        if($session->get('authenticated'))
+        {
+            try
+            {
+                $user = $this->userRepo->findOneBy(['email' => $session->get('email')]);
+                $recipe = $this->recipeRepo->findOneBy(['id' => $id]);
+                if (!$recipe) 
+                {
+                    return new JsonResponse(['error' => 'Recipe not found'], 404);
+                }
+
+                if($user === $recipe->getUser())
+                {
+                    $user->removeRecipe($recipe);
+                    $this->entityManager->persist($user);
+                    $this->entityManager->remove($recipe);
+                    $this->entityManager->flush();
+                    return new JsonResponse('Recipe successfully deleted!', 200);
+                }
+                else
+                {
+                    return new JsonResponse('You are not allowed to delete this recipe', 400);
+                }
+                
+            }
+            catch(\Exception $e)
+            {
+                return new JsonResponse(['Caught exception:' => $e->getMessage()]);
+            }
+        }
+        else
+        {
+            return new JsonResponse("You need to loggin to delete a recipe", 409);
+        }
     }
 
     #[Route('new_recipe', methods: 'POST')]
@@ -56,7 +124,7 @@ class RecipeController extends AbstractController
             $recipe->setMealType($data['meal_type'] ?? $recipe->getMealType());
 
             $user->addRecipe($recipe);
-
+        
             $errors = $this->validator->validate($recipe);
             if (count($errors) > 0 ) 
             {
@@ -81,7 +149,7 @@ class RecipeController extends AbstractController
         }
     }
 
-    #[Route('update_recipe/{id}', methods: 'POST')]
+    #[Route('update_recipe/{id}', methods: 'PUT')]
     public function update_recipe( Request $req, int $id, SessionInterface $session): JsonResponse
     {
         if($session->get('authenticated'))
