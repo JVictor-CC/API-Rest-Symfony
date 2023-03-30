@@ -125,14 +125,11 @@ To create a new recipe, send a POST request to `http://localhost:8001/api/v1/rec
 
 To update a recipe created by you, send a `PUT` request to `http://localhost:8001/api/v1/recipes/update_recipe/{id}` with the JSON payload with properties you want to change.
 
+To retrieve a list of recipes, send a `GET` request to `http://localhost:8000/api/v1/recipes/list?limit=5` and chose the limit (default limit = 10).
 
-***I still have to improve the listing methods.***
+To retrieve a specific recipe, send a `GET` request to `http://localhost:8000/api/v1/recipes/list_by_id/{id}` where {id} is the ID of the recipe.
 
-To retrieve a list of recipes, send a GET request to `http://localhost:8000/api/v1/recipes/list?limit=5` and chose the limit (default limit = 10).
-
-To retrieve a specific recipe, send a GET request to `http://localhost:8000/api/v1/recipes/list/{id}` where {id} is the ID of the recipe. ***(ToDo)***
-
-To delete a recipe you created, send a DELETE request to /api/recipes/{id}. ***(ToDo)***
+To delete a recipe you created, send a `DELETE` request to `http://localhost:8000/api/v1/recipes/delete_recipe/{id}`.
 
 
-This project was created by João Victor. If you have any questions or comments, please contact me.
+***This project was created by João Victor. If you have any questions or comments, please contact me.***
