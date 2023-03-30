@@ -70,12 +70,21 @@ To log in, send a `POST` request to `http://localhost:8000/api/v1/user/login` wi
 >json
 ```json
 {
-  "email": "jvcunha1221@hotmail.com",
-  "password": "jotinha123"
+  "email": "teste@email.com",
+  "password": "teste123"
 }
 ```
 
 To log out, send a `POST` request to `http://localhost:8000/api/v1/user/logout` and your session will be ended.
+
+To reset your password, send a `POST` request to `http://localhost:8001/api/v1/user/reset_password` with the following JSON payload:
+> json
+```json
+{
+  "old_password":"teste123",
+  "new_password":"newteste123"
+}
+```
 
 **Recipes**
 
@@ -113,35 +122,17 @@ To create a new recipe, send a POST request to `http://localhost:8001/api/v1/rec
   "cuisine_type": null      //optional
 }
 ```
-__I still have to improve the listing methods.__
 
-To retrieve a list of recipes, send a GET request to http://localhost:8000/api/v1/recipes/list?limit=5 and chose the limit (default limit = 10).
+To update a recipe created by you, send a `PUT` request to `http://localhost:8001/api/v1/recipes/update_recipe/{id}` with the JSON payload with properties you want to change.
 
-To retrieve a specific recipe, send a GET request to /api/recipes/{id} where {id} is the ID of the recipe.
 
-To update a recipe, send a PUT request to /api/recipes/{id} with the following JSON payload:
+***I still have to improve the listing methods.***
 
-json
+To retrieve a list of recipes, send a GET request to `http://localhost:8000/api/v1/recipes/list?limit=5` and chose the limit (default limit = 10).
 
-{
-    "title": "Your Updated Recipe Title",
-    "description": "Your Updated Recipe Description"
-}
+To retrieve a specific recipe, send a GET request to `http://localhost:8000/api/v1/recipes/list/{id}` where {id} is the ID of the recipe. ***(ToDo)***
 
-To delete a recipe, send a DELETE request to /api/recipes/{id}.
+To delete a recipe you created, send a DELETE request to /api/recipes/{id}. ***(ToDo)***
 
-To share a recipe with another user, send a POST request to /api/recipes/{id}/share with the following JSON payload:
 
-json
-
-{
-    "username": "the-username-you-want-to-share-with"
-}
-
-This will grant the specified user permission to view and edit the recipe.
-License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-Credits
-
-This project was created by your name. If you have any questions or comments, please contact me at your email address.
+This project was created by João Victor. If you have any questions or comments, please contact me.
